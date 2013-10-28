@@ -8,44 +8,41 @@ function initialize() {
   var map = new google.maps.Map(document.getElementById("map-canvas"),
     mapOptions);
 
-  var input = /** @type {HTMLInputElement} */(document.getElementById('searchTextField'));
-  var autocomplete = new google.maps.places.Autocomplete(input);
+  var fromInput = /** @type {HTMLInputElement} */(document.getElementById('fromField'));
+  var toInput = /** @type {HTMLInputElement} */(document.getElementById('toField'));
+  var inputs = [fromInput, toInput];
 
-  autocomplete.bindTo('bounds', map);
+  for (i = 0; i < 2; i++) {
+    var input = inputs[i];
 
-  var marker = new google.maps.Marker({
-    map: map
-  });
+    var autocomplete = new google.maps.places.Autocomplete(input);
+    autocomplete.bindTo('bounds', map);
 
-  google.maps.event.addListener(autocomplete, 'place_changed', function() {
-    marker.setVisible(false);
-    input.className = '';
-    var place = autocomplete.getPlace();
-    if (!place.geometry) {
-      // Inform the user that the place was not found and return.
-      input.className = 'notfound';
-      return;
-    }
+    marker = new google.maps.Marker({map: map});
 
-    marker.setIcon(/** @type {google.maps.Icon} */({
-      url: place.icon,
-      size: new google.maps.Size(71, 71),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(17, 34),
-      scaledSize: new google.maps.Size(35, 35)
-    }));
-    marker.setPosition(place.geometry.location);
-    marker.setVisible(true);
+    google.maps.event.addListener(autocomplete, 'place_changed', (function(marker, autocomplete) {
+      return function() {
+        marker.setVisible(false);
+        input.className = '';
+        var place = autocomplete.getPlace();
+        if (!place.geometry) {
+          // Inform the user that the place was not found and return.
+          input.className = 'notfound';
+          return;
+        }
 
-    var address = '';
-    if (place.address_components) {
-      address = [
-        (place.address_components[0] && place.address_components[0].short_name || ''),
-        (place.address_components[1] && place.address_components[1].short_name || ''),
-        (place.address_components[2] && place.address_components[2].short_name || '')
-      ].join(' ');
-    }
-  });
+        marker.setIcon(/** @type {google.maps.Icon} */({
+          url: place.icon,
+          size: new google.maps.Size(71, 71),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(17, 34),
+          scaledSize: new google.maps.Size(35, 35)
+        }));
+        marker.setPosition(place.geometry.location);
+        marker.setVisible(true);
+      }
+    })(marker, autocomplete));
+  }
 }
 google.maps.event.addDomListener(window, 'load', initialize);
 
