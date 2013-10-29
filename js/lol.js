@@ -1,11 +1,13 @@
 var dirDisp;
 var directionsService = new google.maps.DirectionsService();
 var fromInput, toInput;
+var inputs = [], markers = [], autocompletes = [];
 
 function initialize() {
   fromInput = /** @type {HTMLInputElement} */(document.getElementById('fromField'));
   toInput = /** @type {HTMLInputElement} */(document.getElementById('toField'));
-  var inputs = [fromInput, toInput];
+  inputs = [fromInput, toInput];
+
   var mapOptions = {
     center: new google.maps.LatLng(40.7143528, -74.0059731),
     zoom: 10,
@@ -16,14 +18,16 @@ function initialize() {
   dirDisp.setMap(map);
 
   for (i = 0; i < 2; i++) {
-    var input = inputs[i];
-    var autocomplete = new google.maps.places.Autocomplete(input);
-    autocomplete.bindTo('bounds', map);
+    autocompletes[i] = new google.maps.places.Autocomplete(inputs[i]);
+    autocompletes[i].bindTo('bounds', map);
 
-    marker = new google.maps.Marker({map: map});
+    markers[i] = new google.maps.Marker({map: map});
 
-    google.maps.event.addListener(autocomplete, 'place_changed', (function(marker, autocomplete, input) {
+    google.maps.event.addListener(autocompletes[i], 'place_changed', (function(i) {
       return function() {
+        var marker = markers[i],
+            autocomplete = autocompletes[i],
+            input = inputs[i];
         marker.setVisible(false);
         input.className = '';
         var place = autocomplete.getPlace();
@@ -43,7 +47,7 @@ function initialize() {
         marker.setPosition(place.geometry.location);
         marker.setVisible(true);
       }
-    })(marker, autocomplete, input));
+    })(i));
   }
 }
 
