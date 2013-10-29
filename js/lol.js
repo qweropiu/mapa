@@ -59,7 +59,15 @@ function calcRoute() {
   };
   directionsService.route(request, function(response, status) {
     if (status == google.maps.DirectionsStatus.OK) {
+      var timeSeconds = 0;
+      var legs = response["routes"][0]["legs"]
+
       dirDisp.setDirections(response);
+
+      for (var i = 0, len = legs.length; i < len; i++) {
+        timeSeconds += legs[i]["duration"]["value"];
+      }
+      document.getElementById("duration").innerHTML = "this trip takes " + hms(timeSeconds);
     }
   });
 }
