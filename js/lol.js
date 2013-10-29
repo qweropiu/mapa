@@ -1,11 +1,10 @@
 var dirDisp;
 var directionsService = new google.maps.DirectionsService();
-var fromInput, toInput;
 var inputs = [], markers = [], autocompletes = [];
 
 function initialize() {
-  fromInput = /** @type {HTMLInputElement} */(document.getElementById('fromField'));
-  toInput = /** @type {HTMLInputElement} */(document.getElementById('toField'));
+  var fromInput = $("#fromField")[0];
+  var toInput = $("#toField")[0];
   inputs = [fromInput, toInput];
 
   var mapOptions = {
@@ -13,7 +12,7 @@ function initialize() {
     zoom: 10,
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
-  var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+  var map = new google.maps.Map($("#map-canvas")[0], mapOptions);
   dirDisp = new google.maps.DirectionsRenderer();
   dirDisp.setMap(map);
 
@@ -28,15 +27,15 @@ function initialize() {
         var marker = markers[i],
             autocomplete = autocompletes[i],
             input = inputs[i];
-        marker.setVisible(false);
-        input.className = '';
         var place = autocomplete.getPlace();
+
+        input.className = '';
         if (!place.geometry) {
-          // Inform the user that the place was not found and return.
           input.className = 'notfound';
           return;
         }
 
+        marker.setVisible(false);
         marker.setIcon(/** @type {google.maps.Icon} */({
           url: place.icon,
           size: new google.maps.Size(71, 71),
@@ -53,21 +52,21 @@ function initialize() {
 
 function calcRoute() {
   var request = {
-      origin: fromInput.value,
-      destination: toInput.value,
+      origin: $("#fromField").val(),
+      destination: $("#toField").val(),
       travelMode: google.maps.DirectionsTravelMode.TRANSIT
   };
   directionsService.route(request, function(response, status) {
     if (status == google.maps.DirectionsStatus.OK) {
       var timeSeconds = 0;
-      var legs = response["routes"][0]["legs"]
+      var legs = response["routes"][0]["legs"];
 
       dirDisp.setDirections(response);
 
       for (var i = 0, len = legs.length; i < len; i++) {
         timeSeconds += legs[i]["duration"]["value"];
       }
-      document.getElementById("duration").innerHTML = "this trip takes " + hms(timeSeconds);
+      $("#duration").html("this trip takes " + hms(timeSeconds));
     }
   });
 }

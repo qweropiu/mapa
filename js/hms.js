@@ -7,3 +7,9 @@ function hms(s) {
   if (!r.length) return s + " s";
   return r.join(" ");
 }
+
+function swapFromTo() {
+  var tmp = $("#fromField").val();
+  $("#fromField").val($("#toField").val());
+  $("#toField").val(tmp);
+}
