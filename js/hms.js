@@ -5,5 +5,5 @@ function hms(s) {
   if (h > 0) r.push.apply(r, [h, "h"]);
   if (m > 0) r.push.apply(r, [m, "m"]);
   if (!r.length) return s + " s";
-  return r;
+  return r.join(" ");
 }
